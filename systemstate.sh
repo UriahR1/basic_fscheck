@@ -11,6 +11,8 @@ printf "\n"
 
 THRESHOLD=85
 PARTITION="/var"
+NL=$(printf \n)
+
 
 #Get the current /var partition storage percentage and warn if needed
 USAGE=$(df -h "$PARTITION" | awk 'NR==2 {print $5}' | tr -d '%')
@@ -25,10 +27,10 @@ else
 	echo "$PARTITION currently at ${USAGE}% and below the threshold which is ($THRESHOLD%)"
 fi
 
-printf "\n"
+$NL
+
 
 #Check the root partition disk usage and warn if critical
-
 ROOTPART="/"
 
 unset USAGE
@@ -45,7 +47,10 @@ if [ "$USAGE" -le 85 ]; then
 	echo "$ROOTPART Partiton usage currently at ${USAGE}%"
 fi
 
-printf "\n"
+$NL
+
+
+
 
 #Check Docekr status according to systecmtl output
 
@@ -57,27 +62,33 @@ else
 	echo "Docker is currently in a $DOCKERSTATUS state"
 fi
 
-printf "\n"
+$NL
+
 
 #Check amount of zombie processes or ignore output if there are none
-
 ZOMBIE=$(ps -eo stat | grep Z | wc -l)
 
 if [ "$ZOMBIE" -gt 0 ]; then
 	echo "Curerntly $ZOMBIE processes in a zombie state"
 fi
 
-printf "\n"
+
+
 
 #Check amount of errors in /var logs and output amount or further investigation
-
 logs=$(find /var/log/*.log)
 errors=$(cat $logs | grep -c "error")
 
-echo "Currently $errors errors in /var logs"
+echo "$errors errors in /var logs"
+
+$NL
+
 echo "Would you like to see these errors in detail ?"
 
-read -p "Y/N" ANSWER
+echo "Y/N"
+
+read ANSWER
+
 
 ONLYERROR=$(cat $logs | grep "error")
 if [ "$ANSWER" = "Y" ]; then
